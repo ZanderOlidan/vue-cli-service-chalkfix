@@ -9,7 +9,6 @@ const create = require('@vue/cli-test-utils/createTestProject')
 const launchPuppeteer = require('@vue/cli-test-utils/launchPuppeteer')
 
 let server, browser, page
-
 test('build', async () => {
   const project = await create('e2e-build', defaults)
 
@@ -24,8 +23,8 @@ test('build', async () => {
   const hasFile = file => fs.existsSync(path.join(distDir, file))
   expect(hasFile('index.html')).toBe(true)
   expect(hasFile('favicon.ico')).toBe(true)
-  expect(hasFile('static/js')).toBe(true)
-  expect(hasFile('static/css')).toBe(true)
+  expect(hasFile('js')).toBe(true)
+  expect(hasFile('css')).toBe(true)
   expect(hasFile('foo.js')).toBe(true)
 
   const index = await project.read('dist/index.html')
@@ -35,7 +34,7 @@ test('build', async () => {
   // should not preload manifest because it's inlined
   expect(index).not.toMatch(/<link rel=preload [^>]+manifest[^>]+\.js>/)
   // should inline manifest and wepback runtime
-  expect(index).toMatch('window.webpackJsonp=')
+  expect(index).toMatch('webpackJsonp')
 
   const port = await portfinder.getPortPromise()
   server = createServer({ root: distDir })
@@ -56,13 +55,9 @@ test('build', async () => {
   })
 
   expect(h1Text).toMatch('Welcome to Your Vue.js App')
-
-  await browser.close()
-  server.close()
-  browser = server = null
 })
 
 afterAll(async () => {
-  if (browser) await browser.close()
-  if (server) server.close()
+  await browser.close()
+  server.close()
 })
